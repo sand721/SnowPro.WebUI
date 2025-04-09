@@ -3,10 +3,12 @@ import axios from 'axios';
 import {getUserToken} from "./components/utils";
 
 const instanceProfileService = axios.create({
-    baseURL: 'http://localhost:8094', // Замените на ваш базовый URL
+    baseURL: 'http://localhost:5000', // Local
+//    baseURL: 'http://localhost:8086', // Docker
 });
 const instanceLessonService = axios.create({
-    baseURL: 'http://localhost:5130', // Замените на ваш базовый URL
+//    baseURL: 'http://localhost:5130', // Local
+    baseURL: 'http://localhost:8085', // Docker
 });
 
 [instanceProfileService, instanceLessonService].forEach(instance => {

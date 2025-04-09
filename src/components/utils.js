@@ -25,13 +25,13 @@ export const getUserToken = () => {
     }
 };
 
-export const baseClientProfileEndPoint = 'ClientProfileInfo';
+export const baseClientProfileEndPoint = 'api/ClientProfileInfo';
 export const baseLessonEndPoint = 'api/v1/lessons';
 export const navLessonInfo = 'lessoninfo';
 export const navProfileInfo = 'profileinfo';
 export const navInstructorInfo = 'instructorinfo';
 export const navDashboard = 'dashboard';
-export const baseInstructorProfileEndPoint='InstructorProfileInfo';
+export const baseInstructorProfileEndPoint='api/InstructorProfileInfo';
 
 export const lessonTypes = {
     0: "None",
@@ -50,3 +50,4 @@ export const trainingLevels = {
     4: "Expert",
     5: "Master"
 };
+//export const baseLessonEndPoint = "lesson";
