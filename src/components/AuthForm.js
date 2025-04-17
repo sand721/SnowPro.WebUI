@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Container, TextField, Button, Typography, Card, CardContent } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { BASE_URL, LOGIN_ENDPOINT } from "../config";
+import { BASE_AUTH_URL, LOGIN_ENDPOINT } from "../config";
 
-const AuthForm = ({ switchToRegister }) => {
+const AuthForm = ({ switchToRegister, onLogin }) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
@@ -11,22 +11,15 @@ const AuthForm = ({ switchToRegister }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            const response = await fetch(`${BASE_URL}${LOGIN_ENDPOINT}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, password }),
-            });
-            const data = await response.json();
+        if (!username || !password) {
+            setError("Username and password are required.");
+            return;
+        }
 
-            if (response.ok) {
-                localStorage.setItem("user", JSON.stringify(data));
-                navigate("/dashboard");
-            } else {
-                setError(data.error || "Login failed");
-            }
-        } catch (error) {
-            setError("An unexpected error occurred.");
+        try {
+            await onLogin({ username, password }, navigate);
+        } catch (err) {
+            setError("Login failed");
         }
     };
 

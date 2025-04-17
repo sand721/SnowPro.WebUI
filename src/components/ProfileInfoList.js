@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import {axiosProfileService} from '../axiosConfig';
 import { useNavigate } from 'react-router-dom';
-import {baseClientProfileEndPoint, formatDate, getUserToken, navDashboard, navProfileInfo} from './utils';
+import {
+    baseClientProfileEndPoint,
+    formatDate,
+    getUserToken,
+    navDashboard,
+    navInstructorInfo,
+    navProfileInfo
+} from './utils';
 import './ProfileInfo.css';
 import axios from "axios";
 
@@ -28,7 +35,7 @@ const ProfileInfoList = () => {
                 console.warn("❌ Токен истёк! Нужно обновить.");
             }
         }
-        axiosProfileService.get(`/${baseClientProfileEndPoint}/list/1/50`)
+        axiosProfileService.get(`/${baseClientProfileEndPoint}/list?page=1&itemsPerPage=20`)
             .then(response => setClients(response.data))
             .catch(error => console.error(error));
     }, []);
@@ -38,11 +45,14 @@ const ProfileInfoList = () => {
             .then(() => setClients(clients.filter(client => client.id !== id)))
             .catch(error => console.error(error));
     };
+    const handleEdit = (userId) => {
+        console.log("Edit button clicked for userId:", userId);
+        navigate(`/${navDashboard}/${navProfileInfo}/${userId}/edit`);
+    };
 
     return (
         <div>
-            <h1>Profile Info List</h1>
-            <button onClick={() => navigate(`/${navDashboard}/${navProfileInfo}/create`)}>Add New Student</button>
+            <h1>Clients</h1>
             <table>
                 <thead>
                 <tr>
@@ -52,21 +62,29 @@ const ProfileInfoList = () => {
                     <th>Phone</th>
                     <th>Telegram</th>
                     <th>Email</th>
+                    <th>Active</th>
+                    <th>Deleted</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
                 {clients.map(client => (
                     <tr key={client.id}>
-                        <td>{client.surname} {client.name} {client.patronymic}</td>
+                        <td>
+                            {client.surname || client.name || client.patronymic
+                                ? `${client.surname} ${client.name} ${client.patronymic}`
+                                : 'N/A'}
+                        </td>
                         <td>{formatDate(client.birthDate) || 'N/A'}</td>
-                        <th>{client.gender===1 ? 'M' : 'F'}</th>
+                        <td style={{ textAlign: "center" }}>{client.gender===1 ? 'M' : 'F'}</td>
                         <td>{client.phoneNumber}</td>
                         <td>{client.telegramName}</td>
                         <td>{client.email}</td>
+                        <td style={{ textAlign: "center" }}>{client.isActive ? 'Yes' : 'No'}</td>
+                        <td style={{ textAlign: "center" }}>{client.isDeleted ? 'Yes' : 'No'}</td>
                         <td>
-                            <button onClick={() => navigate(`/${navDashboard}/${navProfileInfo}/${client.id}/edit`)}>Edit</button>
-                            <button onClick={() => handleDelete(client.id)}>Delete</button>
+                            <button onClick={() => handleEdit(client.userId)}>Edit</button>
+                            <button onClick={() => handleDelete(client.userId)}>Delete</button>
                         </td>
                     </tr>
                 ))}

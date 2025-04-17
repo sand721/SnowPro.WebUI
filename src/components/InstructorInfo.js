@@ -1,29 +1,48 @@
 ﻿import React, { useState, useEffect } from "react";
 import {axiosProfileService} from '../axiosConfig';
 import { useNavigate } from "react-router-dom";
-import {formatDate, baseInstructorProfileEndPoint, navInstructorInfo, navDashboard} from "./utils";
+import {formatDate, baseInstructorProfileEndPoint, navInstructorInfo, navDashboard, formatDateTime} from "./utils";
 import "./ProfileInfo.css";
-
-const InstructorInfo = ({ mode, id }) => {
+import { useParams } from 'react-router-dom';
+const InstructorInfo = ({ mode }) => {
+    const { id: userId } = useParams();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        name: "",
         surname: "",
+        name: "",
         patronymic: "",
         birthDate: "",
-        gender: 1,
+        gender: 0,
         phoneNumber: "",
         email: "",
+        telegramName: "",
+        hireDate: "",
+        dateDismissal: "",
+        isActive: true,
+        isDeleted: false,
+        updatedDate: "",
+        status: 1,
+        updatedUserId: "",
+        photoId: "",
+        typeSportEquipmentProfile: [],
+        positionId: 0,
+        experienceBeforeHiring: 0,
+        id: "",
+        userId: "",
+        createdDate: "",
     });
     const [instructor, setInstructor] = useState(null);
 
     useEffect(() => {
-        if (id && (mode === "edit" || mode === "view")) {
+        if (userId && (mode === "edit" || mode === "view")) {
             axiosProfileService
-                .get(`/${baseInstructorProfileEndPoint}/${id}`)
+                .get(`/${baseInstructorProfileEndPoint}?userid=${userId}`)
                 .then((response) => {
                     const data = response.data;
                     setFormData({
+                        id: data.id ||"",
+                        userId: data.userId || "",
+                        createdDate: data.createdDate || "",
                         name: data.name || "",
                         surname: data.surname || "",
                         patronymic: data.patronymic || "",
@@ -31,12 +50,18 @@ const InstructorInfo = ({ mode, id }) => {
                         gender: data.gender || 1,
                         phoneNumber: data.phoneNumber || "",
                         email: data.email || "",
+                        telegramName: data.telegramName || "",
+                        hireDate: formatDate(data.hireDate) || "",
+                        dateDismissal: formatDate(data.dateDismissal) || "",
+                        isActive: data.isActive || true,
+                        isDeleted: data.isDeleted || false,
+                        status: 1,
                     });
                     setInstructor(data);
                 })
                 .catch((error) => console.error(error));
         }
-    }, [id, mode]);
+    }, [userId, mode]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -50,15 +75,21 @@ const InstructorInfo = ({ mode, id }) => {
         e.preventDefault();
         const formattedData = {
             ...formData,
-            birthDate: formatDate(formData.birthDate),
+            birthDate: formatDateTime(formData.birthDate) ,
+            hireDate: formatDateTime(formData.hireDate),
+            dateDismissal: formatDateTime(formData.dateDismissal),
         };
         const method = mode === "edit" ? "put" : "post";
-        const url = mode === "edit" ? `/${baseInstructorProfileEndPoint}/${id}` : `/${baseInstructorProfileEndPoint}`;
+        const url = mode === "edit" ? `/${baseInstructorProfileEndPoint}?userid=${userId}` : `/${baseInstructorProfileEndPoint}`;
         axiosProfileService({
             method: method,
             url: url,
             data: formattedData,
         })
+            .then(() => {
+                // Первый запрос успешно завершён
+                return axiosProfileService.put(`/${baseInstructorProfileEndPoint}/confirmСhanges?userid=${userId}&profileStatus=3`);
+            })
             .then(() => navigate(`/${navDashboard}/${navInstructorInfo}`))
             .catch((error) => console.error(error));
     };
@@ -68,9 +99,9 @@ const InstructorInfo = ({ mode, id }) => {
     return (
         <div>
                 <form onSubmit={handleSubmit} className="form-container">
-                    <h1>{mode} Trainer</h1>
+                    <h1>Edit instructor's profile</h1>
                     <div>
-                        <label>Name</label>
+                        <label>First Name</label>
                         <input type="text" name="name" value={formData.name} onChange={handleChange} />
                     </div>
                     <div>
@@ -103,6 +134,26 @@ const InstructorInfo = ({ mode, id }) => {
                     <div>
                         <label>Email</label>
                         <input type="text" name="email" value={formData.email} onChange={handleChange} />
+                    </div>
+                    <div>
+                        <label>Telegram</label>
+                        <input type="text" name="telegramName" value={formData.telegramName} onChange={handleChange} />
+                    </div>
+                    <div>
+                        <label>Hire Date</label>
+                        <input type="date" name="hireDate" value={formData.hireDate} onChange={handleChange} />
+                    </div>
+                    <div>
+                        <label>Date Dismissal</label>
+                        <input type="date" name="dateDismissal" value={formData.dateDismissal} onChange={handleChange} />
+                    </div>
+                    <div>
+                        <label>Is Active</label>
+                        <input type="checkbox" name="isActive" checked={formData.isActive} onChange={() => setFormData({ ...formData, isActive: !formData.isActive })}/>
+                    </div>
+                    <div>
+                        <label>Is Deleted</label>
+                        <input type="checkbox" name="isDeleted" checked={formData.isDeleted} onChange={() => setFormData({ ...formData, isDeleted: !formData.isDeleted })}/>
                     </div>
                     <button type="submit">Save</button>
                 </form>

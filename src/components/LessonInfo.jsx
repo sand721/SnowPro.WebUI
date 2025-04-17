@@ -17,6 +17,7 @@ import {
     lessonTypes,
     trainingLevels
 } from "./utils";
+import AssignInstructorDialog from "./AssignInstructorDialog"; // 👈 импорт
 
 const LessonInfo = ({ open, handleClose, onSuccess, mode, id }) => {
     const initialFormData = {
@@ -31,13 +32,15 @@ const LessonInfo = ({ open, handleClose, onSuccess, mode, id }) => {
     };
 
     const [formData, setFormData] = useState(initialFormData);
-
+    const [assignDialogOpen, setAssignDialogOpen] = useState(false); // 👈 состояние
+    const [currentInstructorId, setCurrentInstructorId] = useState("");
     useEffect(() => {
         if (open && mode === "edit" && id) {
             axiosLessonService
                 .get(`/${baseLessonEndPoint}/${id}`)
                 .then((response) => {
                     const data = response.data.data;
+                    setCurrentInstructorId(data.instructor.instructorId || "");
                     setFormData({
                         lessonId: data.id,
                         name: data.name || "",
@@ -81,70 +84,101 @@ const LessonInfo = ({ open, handleClose, onSuccess, mode, id }) => {
     };
 
     return (
-        <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-            <DialogTitle>{mode === "edit" ? "Edit Lesson" : "Create Lesson"}</DialogTitle>
-            <DialogContent dividers>
-                <Grid container spacing={2}>
-                    {[
-                        { label: "Name", name: "name", type: "text" },
-                        { label: "Description", name: "description", type: "text" },
-                        { label: "Max Students", name: "maxStudents", type: "number" },
-                        { label: "Date Lesson", name: "dateLesson", type: "date" },
-                        { label: "Time Start", name: "timeStart", type: "time" },
-                        { label: "Duration (min)", name: "duration", type: "number" },
-                    ].map(({ label, name, type }) => (
-                        <Grid item xs={12} key={name}>
+        <>
+            <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+                <DialogTitle>{mode === "edit" ? "Edit Lesson" : "Create Lesson"}</DialogTitle>
+                <DialogContent dividers>
+                    <Grid container spacing={2}>
+                        {[{ label: "Name", name: "name", type: "text" },
+                            { label: "Description", name: "description", type: "text" },
+                            { label: "Max Students", name: "maxStudents", type: "number" },
+                            { label: "Date Lesson", name: "dateLesson", type: "date" },
+                            { label: "Time Start", name: "timeStart", type: "time" },
+                            { label: "Duration (min)", name: "duration", type: "number" }
+                        ].map(({ label, name, type }) => (
+                            <Grid item xs={12} key={name}>
+                                <TextField
+                                    fullWidth
+                                    size="small"
+                                    type={type}
+                                    name={name}
+                                    label={label}
+                                    value={formData[name]}
+                                    onChange={handleChange}
+                                    InputLabelProps={["date", "time"].includes(type) ? { shrink: true } : {}}
+                                />
+                            </Grid>
+                        ))}
+
+                        <Grid item xs={12}>
                             <TextField
+                                select
                                 fullWidth
                                 size="small"
-                                type={type}
-                                name={name}
-                                label={label}
-                                value={formData[name]}
+                                name="lessonType"
+                                label="Lesson Type"
+                                value={formData.lessonType}
                                 onChange={handleChange}
-                                InputLabelProps={["date", "time"].includes(type) ? { shrink: true } : {}}
-                            />
+                            >
+                                {Object.entries(lessonTypes).map(([key, val]) => (
+                                    <MenuItem key={key} value={parseInt(key)}>{val}</MenuItem>
+                                ))}
+                            </TextField>
                         </Grid>
-                    ))}
 
-                    <Grid item xs={12}>
-                        <TextField
-                            select
-                            fullWidth
-                            size="small"
-                            name="lessonType"
-                            label="Lesson Type"
-                            value={formData.lessonType}
-                            onChange={handleChange}
-                        >
-                            {Object.entries(lessonTypes).map(([key, val]) => (
-                                <MenuItem key={key} value={parseInt(key)}>{val}</MenuItem>
-                            ))}
-                        </TextField>
-                    </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                select
+                                fullWidth
+                                size="small"
+                                name="trainingLevel"
+                                label="Training Level"
+                                value={formData.trainingLevel}
+                                onChange={handleChange}
+                            >
+                                {Object.entries(trainingLevels).map(([key, val]) => (
+                                    <MenuItem key={key} value={parseInt(key)}>{val}</MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
 
-                    <Grid item xs={12}>
-                        <TextField
-                            select
-                            fullWidth
-                            size="small"
-                            name="trainingLevel"
-                            label="Training Level"
-                            value={formData.trainingLevel}
-                            onChange={handleChange}
-                        >
-                            {Object.entries(trainingLevels).map(([key, val]) => (
-                                <MenuItem key={key} value={parseInt(key)}>{val}</MenuItem>
-                            ))}
-                        </TextField>
+                        {mode === "edit" && (
+                            <Grid item xs={12}>
+                                <Button
+                                    variant="outlined"
+                                    fullWidth
+                                    onClick={() => {
+                                        //console.log("setAssignDialogOpen(true) called");
+                                        setAssignDialogOpen(true);
+                                    }}
+                                >
+                                    Assign Instructor
+                                </Button>
+                            </Grid>
+                        )}
                     </Grid>
-                </Grid>
-            </DialogContent>
-            <DialogActions sx={{ padding: 2 }}>
-                <Button onClick={handleClose}>CANCEL</Button>
-                <Button variant="contained" onClick={handleSubmit}>SAVE</Button>
-            </DialogActions>
-        </Dialog>
+                </DialogContent>
+                <DialogActions sx={{ padding: 2 }}>
+                    <Button onClick={handleClose}>CANCEL</Button>
+                    <Button variant="contained" onClick={handleSubmit}>SAVE</Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* 👉 Диалог для назначения инструктора */}
+            {mode === "edit" && id && (
+                <AssignInstructorDialog
+                    key={assignDialogOpen ? "open" : "closed"}
+                    open={assignDialogOpen}
+                    lessonId={id}
+                    currentInstructorId={currentInstructorId}
+                    onClose={() => setAssignDialogOpen(false)}
+                    onSuccess={() => {
+                        setAssignDialogOpen(false);
+                        onSuccess("Instructor assigned successfully");
+                    }}
+                />
+            )}
+        </>
     );
 };
 

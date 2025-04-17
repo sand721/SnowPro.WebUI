@@ -5,6 +5,9 @@
     if (rc === '0000-12-31') return '';
     return rc;
 };
+export const formatDateTime = (dateTime) => {
+    return dateTime ? formatDate(dateTime) + 'T00:00:00.000000Z' : null;
+}
 export const formatTime = (dateTime) => {
     if (!dateTime) return '';
     const d = new Date(dateTime);

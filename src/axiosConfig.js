@@ -1,14 +1,13 @@
 // src/axiosConfig.js
 import axios from 'axios';
 import {getUserToken} from "./components/utils";
+import {BASE_LESSON_URL, BASE_PROFILE_URL} from "./config";
 
 const instanceProfileService = axios.create({
-    baseURL: 'http://localhost:5000', // Local
-//    baseURL: 'http://localhost:8086', // Docker
+    baseURL: `${BASE_PROFILE_URL}`,
 });
 const instanceLessonService = axios.create({
-//    baseURL: 'http://localhost:5130', // Local
-    baseURL: 'http://localhost:8085', // Docker
+    baseURL: `${BASE_LESSON_URL}`,
 });
 
 [instanceProfileService, instanceLessonService].forEach(instance => {

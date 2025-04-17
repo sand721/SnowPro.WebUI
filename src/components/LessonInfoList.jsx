@@ -79,7 +79,7 @@ const LessonInfoList = () => {
 
     return (
         <Container>
-            <Typography variant="h4" gutterBottom>Lesson Info List</Typography>
+            <Typography variant="h4" gutterBottom>Lessons</Typography>
 
             <Button
                 variant="contained"

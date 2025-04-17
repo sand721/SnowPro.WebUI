@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Container, TextField, Button, Typography, Card, CardContent, Alert } from "@mui/material";
+import { Container, TextField, Button, Typography, Card, CardContent, Alert, MenuItem } from "@mui/material";
 
 const RegisterForm = ({ onRegister, switchToLogin, registrationError }) => {
     const [formData, setFormData] = useState({
@@ -58,6 +58,7 @@ const RegisterForm = ({ onRegister, switchToLogin, registrationError }) => {
                             onChange={handleChange}
                         />
                         <TextField
+                            select
                             label="Role"
                             name="role"
                             variant="outlined"
@@ -65,7 +66,11 @@ const RegisterForm = ({ onRegister, switchToLogin, registrationError }) => {
                             margin="normal"
                             value={formData.role}
                             onChange={handleChange}
-                        />
+                        >
+                            <MenuItem value="Admin">Admin</MenuItem>
+                            <MenuItem value="Client">Client</MenuItem>
+                            <MenuItem value="Instructor">Instructor</MenuItem>
+                        </TextField>
                         <TextField
                             label="Password"
                             name="password"

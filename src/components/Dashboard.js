@@ -15,13 +15,13 @@ const Dashboard = ({mode}) => {
     const user = JSON.parse(localStorage.getItem('user')) || {};
 
     if (!user.role) {
-        navigate('/login');
+        navigate('/');
         return null;
     }
 
     const handleLogout = () => {
         localStorage.removeItem('user');
-        navigate('/login');
+        navigate('/');
     };
 
     // 🔹 Функция для рендеринга содержимого в `main-layout`

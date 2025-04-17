@@ -6,7 +6,7 @@ import RegistrationSuccess from "./components/RegistrationSuccess";
 import Dashboard from "./components/Dashboard";
 import './App.css';
 import {navDashboard, navInstructorInfo, navLessonInfo, navProfileInfo} from "./components/utils";
-import { BASE_URL, LOGIN_ENDPOINT, REGISTER_ENDPOINT } from "./config";
+import { BASE_AUTH_URL, LOGIN_ENDPOINT, REGISTER_ENDPOINT } from "./config";
 
 const App = () => {
     const [isRegistering, setIsRegistering] = useState(false);
@@ -15,7 +15,7 @@ const App = () => {
 
     const handleLogin = async (credentials, navigate) => {
         try {
-            const response = await fetch(`${BASE_URL}${LOGIN_ENDPOINT}`, {
+            const response = await fetch(`${BASE_AUTH_URL}${LOGIN_ENDPOINT}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(credentials),
@@ -28,6 +28,7 @@ const App = () => {
                 navigate(`/${navDashboard}`);
             } else {
                 console.error("Login Failed:", data.error || "Login failed");
+                throw new Error(data.error || "Login failed"); // 👈 важно
             }
         } catch (error) {
             console.error("Login Failed:", error);
@@ -36,7 +37,7 @@ const App = () => {
 
     const handleRegister = async (credentials) => {
         try {
-            const response = await fetch(`${BASE_URL}${REGISTER_ENDPOINT}`, {
+            const response = await fetch(`${BASE_AUTH_URL}${REGISTER_ENDPOINT}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(credentials),
@@ -71,7 +72,6 @@ const App = () => {
                         <RegisterForm onRegister={handleRegister} switchToLogin={() => setIsRegistering(false)} registrationError={registrationError} /> : 
                         <AuthForm onLogin={handleLogin} switchToRegister={() => setIsRegistering(true)} />
                 } />
-                <Route path="/login" element={<AuthForm />} />
                 <Route path={`/${navDashboard}`} element={<Dashboard />} />
                 <Route path={`/${navDashboard}/${navProfileInfo}`} element={<Dashboard mode="profileinfo" />} />
                 <Route path={`/${navDashboard}/${navProfileInfo}/:id/edit`} element={<Dashboard mode="profileinfo-edit" />} />
