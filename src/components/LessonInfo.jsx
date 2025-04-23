@@ -40,7 +40,8 @@ const LessonInfo = ({ open, handleClose, onSuccess, mode, id }) => {
                 .get(`/${baseLessonEndPoint}/${id}`)
                 .then((response) => {
                     const data = response.data.data;
-                    setCurrentInstructorId(data.instructor.instructorId || "");
+                    console.log("Lesson data:", data);
+                    setCurrentInstructorId(data.instructor?.instructorId || "");
                     setFormData({
                         lessonId: data.id,
                         name: data.name || "",

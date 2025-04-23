@@ -2,8 +2,8 @@ import React from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import './Dashboard.css';
 import {navDashboard, navInstructorInfo, navLessonInfo, navProfileInfo} from "./utils";
-import ProfileInfo from "./ProfileInfo";
-import ProfileInfoList from "./ProfileInfoList";
+import ClientInfo from "./ClientInfo";
+import ClientInfoList from "./ClientInfoList";
 import LessonInfo from "./LessonInfo";
 import LessonInfoList from "./LessonInfoList";
 import InstructorInfo from "./InstructorInfo";
@@ -28,11 +28,11 @@ const Dashboard = ({mode}) => {
     const renderMainForm = () => {
         switch (mode) {
             case `${navProfileInfo}-edit`:
-                return <ProfileInfo mode="edit" id={id} />;
+                return <ClientInfo mode="edit" id={id} />;
             case `${navProfileInfo}-create`:
-                return <ProfileInfo />;
+                return <ClientInfo />;
             case `${navProfileInfo}`:
-                return <ProfileInfoList />;
+                return <ClientInfoList />;
 
             case `${navLessonInfo}-edit`:
                 return <LessonInfo mode="edit" id={id} />;
@@ -62,7 +62,7 @@ const Dashboard = ({mode}) => {
                 navigate(`/${navDashboard}/${user.userId}/${navProfileInfo}`);
                 return;
             case 'Client':
-                return <ProfileInfo mode="edit" id={user.userId}/>;
+                return <ClientInfo mode="edit" id={user.userId}/>;
             case 'Instructor':
                 return <InstructorInfo mode="edit" id={user.userId}/>;
             default:

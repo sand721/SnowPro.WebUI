@@ -14,8 +14,6 @@ import MuiAlert from "@mui/material/Alert";
 import { axiosLessonService } from "../axiosConfig";
 import {
     baseLessonEndPoint,
-    navDashboard,
-    navLessonInfo,
     formatDate,
     formatTime
 } from "./utils";
@@ -39,7 +37,10 @@ const LessonInfoList = () => {
     const loadLessons = () => {
         axiosLessonService
             .get(`/${baseLessonEndPoint}`)
-            .then((res) => setLessons(res.data.data || []))
+            .then((res) => {
+                console.log("📦 Загруженные уроки:", res.data); // <-- здесь отладка
+                setLessons(res.data.data || []);
+            })
             .catch(console.error);
     };
 
@@ -78,6 +79,7 @@ const LessonInfoList = () => {
     };
 
     return (
+
         <Container>
             <Typography variant="h4" gutterBottom>Lessons</Typography>
 
@@ -136,7 +138,7 @@ const LessonInfoList = () => {
                                 <TableCell>{lesson.description}</TableCell>
                                 <TableCell>{lesson.duration}</TableCell>
                                 <TableCell>{lesson.trainingLevel?.name || "N/A"}</TableCell>
-                                <TableCell>{lesson.trainer?.name || "No trainer assigned"}</TableCell>
+                                <TableCell>{lesson.instructor?.name || "No trainer assigned"}</TableCell>
                                 <TableCell>
                                     <Button size="small" onClick={() => openEditModal(lesson.id)}>Edit</Button>
                                     <Button size="small" color="error" onClick={() => handleDelete(lesson.id)}>Delete</Button>

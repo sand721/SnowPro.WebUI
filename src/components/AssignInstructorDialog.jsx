@@ -16,9 +16,10 @@ const AssignInstructorDialog = ({open, lessonId, onClose, onSuccess, currentInst
     const [selectedInstructorId, setSelectedInstructorId] = useState("");
 
     useEffect(() => {
+        console.log("AssignInstructorDialog:", currentInstructorId);
         if (!lessonId) return
         axiosProfileService
-            .get(`/${baseInstructorProfileEndPoint}/list/1/20`)
+            .get(`/${baseInstructorProfileEndPoint}/list?page=1&itemsPerPage=20`)
             .then((res) => {
                 const list = res.data || []
                 if (currentInstructorId && list.some(inst => inst.userId === currentInstructorId)) {
@@ -94,7 +95,7 @@ const AssignInstructorDialog = ({open, lessonId, onClose, onSuccess, currentInst
                 >
                     {instructors.map((inst) => (
                         <MenuItem key={inst.userId} value={inst.userId}>
-                            {inst.name}
+                            {inst.surname} {inst.name} {inst.patronymic}
                         </MenuItem>
                     ))}
                 </TextField>
